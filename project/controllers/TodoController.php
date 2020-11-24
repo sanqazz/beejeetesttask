@@ -13,7 +13,7 @@
         //INDEX PAGE
 		public function index() {
 
-            $this->title = 'To-DO List';
+            $this->title = 'Задачник';
 
             $message = '';
             if(isset($_POST['userName']) AND isset($_POST['email']) AND isset($_POST['task'])){
@@ -103,7 +103,7 @@
         //LOGIN
         public function login() {
 
-            $this->title = 'Login';
+            $this->title = 'Страница входа';
             $token = $this->isAuth();
 			return $this->render('todo/login',['token' => $token]);
         }
@@ -139,7 +139,7 @@
 
         //ADMIN
         public function admin($token = '') {
-            $this->title = 'Administrate';
+            $this->title = 'Администрирование';
 
             $countQuery = new Post;
             $count = $countQuery->count()['count'];
@@ -200,7 +200,7 @@
 
         //EDIT POST
         public function edit() {
-            $this->title = 'Edit';
+            $this->title = 'Редактирование';
 
             if(isset($_GET['id'])){
                 $id = $_GET['id'];
@@ -233,7 +233,7 @@
 
         //DELETE POST
         public function delete() {
-            $this->title = 'Delete';
+            $this->title = 'Удаление';
             if ($this->isAuth()){
                     if(isset($_GET['id'])){
                         $id = $_GET['id'];

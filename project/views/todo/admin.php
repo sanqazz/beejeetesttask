@@ -27,7 +27,7 @@
     ?>
     <form method="GET">
     <div class="form-row">
-    <label for="props">СОртировать по:</label>
+    <label for="props">Сортировать по:</label>
         <div class="col-2">
         <select id="props" name="sort" class="form-control">
             <option value="name" <?php if ($sort == "name"){echo "selected";}?>>Имя</option>
