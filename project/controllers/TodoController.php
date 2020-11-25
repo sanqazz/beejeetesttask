@@ -102,14 +102,14 @@
 
         //LOGIN
         public function login() {
-
             $this->title = 'Страница входа';
             $token = $this->isAuth();
-			return $this->render('todo/login',['token' => $token]);
+						return $this->render('todo/login',['token' => $token, 'message' => '']);
         }
 
         //AUTHORIZATION
         public function auth() {
+						$this->title = 'Страница входа';
             if (isset($_POST['login']) AND isset($_POST['password'])){
 
             $userSearch = new User;
@@ -121,14 +121,18 @@
             $user = $userSearch->tryAuth($login, $password);
 
             if($user == false){
-                header("location: login");
+								return $this->render('todo/login',['token' => false, 'message' => 'Вы ввели неправильный логин или пароль']);
                 exit;
             }
 
             $_SESSION['admin'] = true;
 
             header("location: admin");
-            }
+					} else {
+						header("location: login");
+					}
+
+
         }
 
         //EXIT
