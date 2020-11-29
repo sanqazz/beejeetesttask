@@ -10,6 +10,15 @@
 
         public $notesOnPage = 3;
 
+
+        private function filter($filterArr, $filterVal){
+                  
+            if(in_array($filterVal, $filterArr)){
+                $filteredVal = $filterVal;
+            }
+            return $filteredVal;    
+        }
+
         //INDEX PAGE
 		public function index() {
 
@@ -32,28 +41,22 @@
                 }
             }
 
-            $sort = 'name';
 
+            $sortArr = ['name', 'email', 'state'];
+            $sort = 'name';
             if(isset($_GET['sort'])){
-                if($_GET['sort'] == 'email'){
-                    $sort = 'email';
-                } else if($_GET['sort'] == 'state'){
-                    $sort = 'state';
-                }
+                $sort = $this->filter($sortArr, $_GET['sort']);
             }
 
+            $orderArr = ['ASC', 'DESC'];
             $order = 'ASC';
             if(isset($_GET['order'])){
-                if($_GET['order'] == 'ASC'){
-                    $order = 'ASC';
-                } else if($_GET['order'] == 'DESC'){
-                    $order = 'DESC';
-                }
+                $order = $this->filter($orderArr, $_GET['order']);
             }
-
-            $countQuery = new Post;
-            $count = $countQuery->count()['count'];
-            $pagesCount = ceil($count/$this->notesOnPage);
+            
+            $countPostsQuery = new Post;
+            $countPosts = $countPostsQuery->count();
+            $pagesCount = ceil($countPosts/$this->notesOnPage);
 
             if(isset($_GET['page'])){
                 $page = intval($_GET['page']);
@@ -71,23 +74,41 @@
 
             $posts = $postSearch->getAll($sort, $order, $from, $this->notesOnPage);
 
-            $pageReq = isset($_GET['page']) ? "&page=".$_GET['page'] : "";
-            $sortReq = isset($_GET['sort']) ? "&sort=".$_GET['sort'] : "";
-            $orderReq = isset($_GET['order']) ? "&order=".$_GET['order'] : "";
-            $token = $this->isAuth();
 
-            return $this->render('todo/index',
-            ['posts' => $posts,
-             'pagesCount' => $pagesCount,
-             'page' => $page,
-             'token' => $token,
-             'order' => $order,
-             'sort' => $sort,
-             'pageReq' => $pageReq,
-             'sortReq' => $sortReq,
-             'orderReq' => $orderReq,
-             'message' => $message,
-            ]);
+            $existReq = '';
+            $reqArr = ['sort', 'order'];
+
+            foreach($reqArr as $req){
+                if (isset($_GET[$req])){
+                    $existReq .= "&$req=".$_GET[$req];
+                }
+            }
+                        
+            $token = $this->isAuth();
+            $uri = preg_replace('#\?.+#','', $_SERVER['REQUEST_URI']); 
+            if($uri == '/'){
+                return $this->render('todo/index',
+                    ['posts' => $posts,
+                    'pagesCount' => $pagesCount,
+                    'page' => $page,
+                    'token' => $token,
+                    'order' => $order,
+                    'sort' => $sort,
+                    'message' => $message,
+                    'existReq' => $existReq,
+                ]);
+            } else if ($uri == '/admin'){
+                return $this->render('todo/admin',
+                    ['posts' => $posts,
+                    'pagesCount' => $pagesCount,
+                    'page' => $page,
+                    'token' => $token,
+                    'order' => $order,
+                    'sort' => $sort,
+                    'existReq' => $existReq,
+                    ]);
+            }
+
         }
 
         //IS AUTH
@@ -121,7 +142,7 @@
             $user = $userSearch->tryAuth($login, $password);
 
             if($user == false){
-								return $this->render('todo/login',['token' => false, 'message' => 'Вы ввели неправильный логин или пароль']);
+					return $this->render('todo/login',['token' => false, 'message' => 'Вы ввели неправильный логин или пароль']);
                 exit;
             }
 
@@ -131,75 +152,12 @@
 					} else {
 						header("location: login");
 					}
-
-
         }
 
         //EXIT
         public function exit(){
             session_destroy();
             header("location: /");
-        }
-
-        //ADMIN
-        public function admin($token = '') {
-            $this->title = 'Администрирование';
-
-            $countQuery = new Post;
-            $count = $countQuery->count()['count'];
-
-            $postSearch = new Post;
-            $sort = 'name';
-
-            if(isset($_GET['sort'])){
-                if($_GET['sort'] == 'email'){
-                    $sort = 'email';
-                } else if($_GET['sort'] == 'state'){
-                    $sort = 'state';
-                }
-            }
-
-            $order = 'ASC';
-            if(isset($_GET['order'])){
-                if($_GET['order'] == 'ASC'){
-                    $order = 'ASC';
-                } else if($_GET['order'] == 'DESC'){
-                    $order = 'DESC';
-                }
-            }
-
-            $pagesCount = ceil($count/$this->notesOnPage);
-
-            if(isset($_GET['page'])){
-                $page = intval($_GET['page']);
-                if($page < 1){
-                    $page = 1;
-                } else if ($page > $pagesCount){
-                    $page = $pagesCount;
-                }
-            } else {
-                $page = 1;
-            }
-
-            $from = ($page - 1) * $this->notesOnPage;
-            $posts = $postSearch->getAll($sort,$order, $from, $this->notesOnPage);
-
-            $pageReq = isset($_GET['page']) ? "&page=".$_GET['page'] : "";
-            $sortReq = isset($_GET['sort']) ? "&sort=".$_GET['sort'] : "";
-            $orderReq = isset($_GET['order']) ? "&order=".$_GET['order'] : "";
-            $token = $this->isAuth();
-
-            return $this->render('todo/admin',
-            ['posts' => $posts,
-            'pagesCount' => $pagesCount,
-            'page' => $page,
-            'token' => $token,
-            'order' => $order,
-            'sort' => $sort,
-            'pageReq' => $pageReq,
-            'sortReq' => $sortReq,
-            'orderReq' => $orderReq,
-            ]);
         }
 
         //EDIT POST

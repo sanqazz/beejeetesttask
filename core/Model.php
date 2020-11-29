@@ -69,6 +69,7 @@
 
 			$resultObj = $sth->fetch(\PDO::FETCH_OBJ);
 			$result = json_decode(json_encode($resultObj), true);
+			$result = $result['count'];
 
 			$sth = null;
 			self::$dbh = null;

@@ -57,16 +57,16 @@
     </ul>
 
     <?php
-        echo "<a href=\"?page=1".$sortReq.$orderReq."\"><<</a>";
+        echo "<a href=\"?page=1".$existReq."\"><<</a>";
             for ($i = 1; $i <= $pagesCount; $i++){
                 if ($page == $i) {
                     $class = " class =\"active m-2\"";
                 } else {
                     $class = " class =\"\"";
                 }
-                echo "<a href=\"?page=$i".$sortReq.$orderReq."\"$class>$i</a>";
+                echo "<a href=\"?page=$i".$existReq."\"$class>$i</a>";
             }
-        echo "<a href=\"?page=$pagesCount".$sortReq.$orderReq."\">>></a>";
+        echo "<a href=\"?page=$pagesCount".$existReq."\">>></a>";
     ?>
     <?php
         if($message != ''){
